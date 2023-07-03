@@ -10,8 +10,8 @@
  * INCLUDE
  *******************************************************************************/
 #include <Arduino.h>
-// #include <MAX30105.h>
-#include <Wire.h>
+#include <MAX3010x.h>
+// #include <Wire.h>
 
 /******************************************************************************
  * PREPROCESSOR CONSTANTS
@@ -55,6 +55,7 @@
 /******************************************************************************
  * VARIABLE DEFINITIONS
  *******************************************************************************/
+MAX30101 sensor;
 
 /******************************************************************************
  * FUNCTION PROTOTYPES
@@ -102,11 +103,19 @@ void setup()
   // // Setup I2C port
   Wire.setSCL(PIN_SCL);
   Wire.setSDA(PIN_SDA);
-  Wire.begin(); 
+  // Wire.begin(); 
 
   // On serial port
   Serial1.begin(9600);
   Serial1.println("Board test ready.");
+
+  if(sensor.begin()) { 
+    Serial.println("IR,Red");
+  }
+  else {
+    Serial.println("Sensor not found");  
+  }  
+  i2cScanner();
 }
 
 /******************************************************************************
@@ -115,7 +124,6 @@ void setup()
 void loop()
 {
   bool checkResult = false;
-  i2cScanner();
   // Button start is press
   if (digitalRead(BT_START) == BUTTON_ON)
   {
@@ -149,6 +157,15 @@ void loop()
       delay(100);
     }
   }
+
+  // Check PPG
+  auto sample = sensor.readSample(1000);
+  Serial.print("IR: ");
+  Serial.print(sample.ir);
+  Serial.print(",");
+  Serial.print(" LED: ");
+  Serial.println(sample.red);
+  delay(500);
 }
 
 /******************************************************************************
@@ -286,7 +303,7 @@ void i2cScanner()
   {
     Serial1.println("done\n");
   }
-  delay(3000); // Wait 5 seconds for next scan
+  delay(500); // Wait 5 seconds for next scan
 }
 
 
