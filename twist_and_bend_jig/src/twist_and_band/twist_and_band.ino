@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <Servo.h>
 
 Servo servoLeft, servoRight;  // create servo object to control a servo
